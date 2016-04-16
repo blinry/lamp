@@ -3,6 +3,9 @@ rand = (min, max) -> Math.floor Math.random()*(max - min + 1) + min
 stage = null
 queue = null
 light = null
+lamp = null
+flies = null
+room = null
 fireflies = null
 dark = null
 keys = {}
@@ -14,8 +17,8 @@ preload = ->
     queue = new createjs.LoadQueue(false)
     queue.installPlugin(createjs.Sound)
     manifest = [
-        #{src: "piece.wav", id: "piece"}
-        {src: "room.jpg", id: "room"}
+        {src: "click.wav", id: "click"}
+        {src: "roomsmall.jpg", id: "room"}
         {src: "lamp.png", id: "lamp"}
         {src: "light.png", id: "light"}
         {src: "fly.png", id: "fly"}
@@ -43,9 +46,26 @@ init = ->
     #    )
 
     room = new createjs.Bitmap(queue.getResult("room"))
-    room.scaleX = 0.2
-    room.scaleY = 0.2
+    room.scaleX = 1.2
+    room.scaleY = 1.2
     stage.addChild(room)
+
+    dark = new createjs.Shape()
+    dark.graphics.f("black").dr(0,0,stage.canvas.width,stage.canvas.height)
+    stage.addChild(dark)
+    dark.alpha = 0
+
+    light = new createjs.Bitmap(queue.getResult("light"))
+    stage.addChild(light)
+    light.regX = light.getBounds().width/2
+    light.regY = light.getBounds().height/2
+    light.scaleX = 0.5
+    light.scaleY = 0.5
+
+    window = new createjs.Bitmap(queue.getResult("window"))
+    stage.addChild(window)
+    window.x = 100
+    window.y = 100
 
     lamp = new createjs.Bitmap(queue.getResult("lamp"))
     stage.addChild(lamp)
@@ -61,36 +81,18 @@ init = ->
     #lamp.cache(0,0,500,500)
     lampRange = 100
 
+    border = 100
     flies = []
     for n in [1..10]
         fly = new createjs.Bitmap(queue.getResult("fly"))
         stage.addChild(fly)
         fly.regX = fly.getBounds().width/2
         fly.regY = fly.getBounds().height/2
-        fly.x = rand(200,stage.getBounds().width-200)
-        fly.y = rand(200,stage.getBounds().height-200)
-        dir = rand(0,360)/180*Math.PI
-        speed = 1/5
-        fly.dx = Math.cos(dir)*speed
-        fly.dy = Math.sin(dir)*speed
+        fly.x = rand(border,stage.canvas.width-border)
+        fly.y = rand(border,stage.canvas.height-border)
+        fly.dir = rand(0,360)/180*Math.PI
+        fly.speed = 1/5
         flies.push(fly)
-
-    light = new createjs.Bitmap(queue.getResult("light"))
-    stage.addChild(light)
-    light.regX = light.getBounds().width/2
-    light.regY = light.getBounds().height/2
-    light.scaleX = 0.5
-    light.scaleY = 0.5
-
-    dark = new createjs.Shape()
-    dark.graphics.f("black").dr(0,0,stage.canvas.width,stage.canvas.height)
-    stage.addChild(dark)
-    dark.alpha = 0
-
-    window = new createjs.Bitmap(queue.getResult("window"))
-    stage.addChild(window)
-    window.x = 400
-    window.y = 400
 
     fireflies = []
     for n in [1..10]
@@ -98,12 +100,10 @@ init = ->
         stage.addChild(fly)
         fly.regX = fly.getBounds().width/2
         fly.regY = fly.getBounds().height/2
-        fly.x = rand(200,stage.getBounds().width-200)
-        fly.y = rand(200,stage.getBounds().height-200)
-        dir = rand(0,360)/180*Math.PI
-        speed = 1/5
-        fly.dx = Math.cos(dir)*speed
-        fly.dy = Math.sin(dir)*speed
+        fly.x = rand(border,stage.canvas.width-border)
+        fly.y = rand(border,stage.canvas.height-border)
+        fly.dir = rand(0,360)/180*Math.PI
+        fly.speed = 1/5
         fireflies.push(fly)
 
     lamp.on("tick", (event) ->
@@ -128,42 +128,37 @@ init = ->
         #this.y -= Math.sin(this.rotation/180*Math.PI)*this.speed*event.delta
     )
 
-    for fly in flies
+    for fly in flies.concat(fireflies)
         fly.on("tick", (event) ->
-            #dir = Math.atan2(lamp.y-this.y, lamp.x-this.x)
-            #dx = Math.cos(this.dir)*event.delta*this.speed+Math.cos(dir)*(lampRange-dist)*event.delta
-            #dy = Math.sin(this.dir)*event.delta*this.speed+Math.sin(dir)*(lampRange-dist)*event.delta
-            #this.dir = Math.atan2(dy, dx)
+            dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
+            pull = if dark.alpha < 1
+                Math.sqrt(dist)/1000
+            else
+                0
+            dir = Math.atan2(lamp.y-this.y, lamp.x-this.x)
+            randDir = rand(0,360)/180*Math.PI
+            randStrength = 1/20
+            dx = Math.cos(this.dir)*this.speed+Math.cos(dir)*pull+Math.cos(randDir)*randStrength
+            dy = Math.sin(this.dir)*this.speed+Math.sin(dir)*pull+Math.sin(randDir)*randStrength
+            this.dir = Math.atan2(dy, dx)
+            this.speed = Math.sqrt(dy**2+dx**2)
+            if this.speed > 1/5
+                this.speed *= 0.8
 
-            if (dark.alpha < 1)
-                dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
-                this.dx += (lamp.x-this.x)/(dist**2+500)
-                this.dy += (lamp.y-this.y)/(dist**2+500)
-            dist = Math.sqrt(this.dx**2 + this.dy**2)
-            speed = 1/10
-            this.dx *= speed/dist
-            this.dy *= speed/dist
-            this.x += this.dx*event.delta
-            this.y += this.dy*event.delta
-        )
+            this.x += Math.cos(this.dir)*event.delta*this.speed
+            this.y += Math.sin(this.dir)*event.delta*this.speed
 
-    for fly in fireflies
-        fly.on("tick", (event) ->
-            #dir = Math.atan2(lamp.y-this.y, lamp.x-this.x)
-            #dx = Math.cos(this.dir)*event.delta*this.speed+Math.cos(dir)*(lampRange-dist)*event.delta
-            #dy = Math.sin(this.dir)*event.delta*this.speed+Math.sin(dir)*(lampRange-dist)*event.delta
-            #this.dir = Math.atan2(dy, dx)
+            #if (dark.alpha < 1)
+            #    dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
+            #    this.dx += (lamp.x-this.x)/1000
+            #    this.dy += (lamp.y-this.y)/1000
+            #dist = Math.sqrt(this.dx**2 + this.dy**2)
+            #speed = 1/10
+            #this.dx *= speed/dist
+            #this.dy *= speed/dist
+            #this.x += this.dx*event.delta
+            #this.y += this.dy*event.delta
 
-            if (dark.alpha < 1)
-                dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
-                this.dx += (lamp.x-this.x)/(dist**2+500)
-                this.dy += (lamp.y-this.y)/(dist**2+500)
-            dist = Math.sqrt(this.dx**2 + this.dy**2)
-            speed = 1/10
-            this.dx *= speed/dist
-            this.dy *= speed/dist
-            this.x += this.dx*event.delta
-            this.y += this.dy*event.delta
         )
 
     #s = new createjs.Shape()
@@ -192,15 +187,29 @@ tick = (event) ->
 keydown = (event) ->
     keys[event.keyCode] = true
 
+    objects = [lamp].concat(flies)
+
     if event.keyCode == 32
+        createjs.Sound.play("click")
         if dark.alpha == 1
+            # switch light on
             createjs.Tween.get(dark).to({alpha:0},100)
             for fly in fireflies
                 createjs.Tween.get(fly).to({alpha:0},100)
+
+            for object in objects
+                object.uncache()
         else
+            # switch light off
             createjs.Tween.get(dark).to({alpha:1},100)
             for fly in fireflies
                 createjs.Tween.get(fly).to({alpha:1},100)
+
+            for object in objects
+                object.filters = [
+                    new createjs.ColorFilter(1,1,1,1,-255,-255,-255,0)
+                ]
+                object.cache(0,0,object.getBounds().width,object.getBounds().height)
 
 keyup = (event) ->
     keys[event.keyCode] = false
