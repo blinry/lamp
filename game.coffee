@@ -20,6 +20,7 @@ preload = ->
     queue.installPlugin(createjs.Sound)
     manifest = [
         {src: "click.wav", id: "click"}
+        {src: "nom.wav", id: "nom"}
         {src: "roomsmall.jpg", id: "room"}
         {src: "lamp.png", id: "lamp"}
         {src: "light.png", id: "light"}
@@ -58,6 +59,11 @@ init = ->
     stage.addChild(dark)
     dark.alpha = 0
 
+    mouse = new createjs.Bitmap(queue.getResult("mouse"))
+    stage.addChild(mouse)
+    mouse.x = 600
+    mouse.y = 500
+
     light = new createjs.Bitmap(queue.getResult("light"))
     stage.addChild(light)
     light.regX = light.getBounds().width/2
@@ -69,11 +75,6 @@ init = ->
     stage.addChild(win)
     win.x = 100
     win.y = 100
-
-    mouse = new createjs.Bitmap(queue.getResult("mouse"))
-    stage.addChild(mouse)
-    mouse.x = 600
-    mouse.y = 500
 
     lamp = new createjs.Bitmap(queue.getResult("lamp"))
     stage.addChild(lamp)
@@ -87,7 +88,7 @@ init = ->
     lamp.dy = 0
     #lamp.filters = [ new createjs.BlurFilter(5, 5, 2) ]
     #lamp.cache(0,0,500,500)
-    lampRange = 100
+    lampRange = 400
 
     border = 100
     flies = []
@@ -166,29 +167,35 @@ init = ->
         )
 
     mouse.on("tick", (event) ->
-        toDelete = []
-        nearestDeadFly = null
-        minDist = 999999
-        for fly in flies when fly.floor
-            dist = Math.sqrt((this.x-fly.x)**2 + (this.y-fly.y)**2)
-            if dist < 20
-                toDelete.push(fly)
-            else if dist < minDist
-                minDist = dist
-                nearestDeadFly = fly
-
-        for fly in toDelete
-            stage.removeChild(fly)
-            index = flies.indexOf(fly)
-            flies.splice(index, 1)
-
-        if nearestDeadFly != null
-            dir = Math.atan2(nearestDeadFly.y-this.y, nearestDeadFly.x-this.x)
-            this.dir = dir
+        lampDist = Math.sqrt((this.x-lamp.x)**2 + (this.y-lamp.y)**2)
+        if dark.alpha < 1 and lampDist < lampRange
+            this.dir = Math.atan2(lamp.y-this.y, lamp.x-this.x)+Math.PI
             this.speed = 1/10
         else
-            this.dir = 0
-            this.speed = 0
+            toDelete = []
+            nearestDeadFly = null
+            minDist = 999999
+            for fly in flies when fly.floor
+                dist = Math.sqrt((this.x-fly.x)**2 + (this.y-fly.y)**2)
+                if dist < 20
+                    toDelete.push(fly)
+                    createjs.Sound.play("nom")
+                else if dist < minDist
+                    minDist = dist
+                    nearestDeadFly = fly
+
+            for fly in toDelete
+                stage.removeChild(fly)
+                index = flies.indexOf(fly)
+                flies.splice(index, 1)
+
+            if nearestDeadFly != null
+                dir = Math.atan2(nearestDeadFly.y-this.y, nearestDeadFly.x-this.x)
+                this.dir = dir
+                this.speed = 1/20
+            else
+                this.dir = 0
+                this.speed = 0
 
         this.x += Math.cos(this.dir)*event.delta*this.speed
         this.y += Math.sin(this.dir)*event.delta*this.speed
@@ -217,7 +224,7 @@ init = ->
 tick = (event) ->
     stage.update(event)
 
-    if rand(1,1000/event.delta) == 1
+    if rand(1,10000/event.delta) == 1
         fly = new createjs.Bitmap(queue.getResult("fly"))
         stage.addChild(fly)
         fly.regX = fly.getBounds().width/2
