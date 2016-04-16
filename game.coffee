@@ -5,6 +5,8 @@ queue = null
 light = null
 lamp = null
 flies = null
+win = null
+mouse = null
 room = null
 fireflies = null
 dark = null
@@ -23,6 +25,7 @@ preload = ->
         {src: "light.png", id: "light"}
         {src: "fly.png", id: "fly"}
         {src: "window.png", id: "window"}
+        {src: "mouse.png", id: "mouse"}
     ]
     queue.loadManifest(manifest)
     queue.on("complete", (event) ->
@@ -62,10 +65,15 @@ init = ->
     light.scaleX = 0.5
     light.scaleY = 0.5
 
-    window = new createjs.Bitmap(queue.getResult("window"))
-    stage.addChild(window)
-    window.x = 100
-    window.y = 100
+    win = new createjs.Bitmap(queue.getResult("window"))
+    stage.addChild(win)
+    win.x = 100
+    win.y = 100
+
+    mouse = new createjs.Bitmap(queue.getResult("mouse"))
+    stage.addChild(mouse)
+    mouse.x = 600
+    mouse.y = 500
 
     lamp = new createjs.Bitmap(queue.getResult("lamp"))
     stage.addChild(lamp)
@@ -95,7 +103,7 @@ init = ->
         flies.push(fly)
 
     fireflies = []
-    for n in [1..10]
+    for n in []
         fly = new createjs.Bitmap(queue.getResult("fly"))
         stage.addChild(fly)
         fly.regX = fly.getBounds().width/2
@@ -131,35 +139,60 @@ init = ->
     for fly in flies.concat(fireflies)
         fly.on("tick", (event) ->
             dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
-            pull = if dark.alpha < 1
-                Math.sqrt(dist)/1000
+
+            if this.dead
+                # nop
+            else if dist < 50
+                this.dead = true
+                createjs.Tween.get(this).to({y:stage.canvas.height-rand(0,100), rotation:rand(170,190)}, 1000, createjs.Ease.quadIn).set({floor:true})
             else
-                0
-            dir = Math.atan2(lamp.y-this.y, lamp.x-this.x)
-            randDir = rand(0,360)/180*Math.PI
-            randStrength = 1/20
-            dx = Math.cos(this.dir)*this.speed+Math.cos(dir)*pull+Math.cos(randDir)*randStrength
-            dy = Math.sin(this.dir)*this.speed+Math.sin(dir)*pull+Math.sin(randDir)*randStrength
-            this.dir = Math.atan2(dy, dx)
-            this.speed = Math.sqrt(dy**2+dx**2)
-            if this.speed > 1/5
-                this.speed *= 0.8
+                this.rotation = rand(-10,10)
+                pull = if dark.alpha < 1
+                    Math.sqrt(dist)/1000
+                else
+                    0
+                dir = Math.atan2(lamp.y-this.y, lamp.x-this.x)
+                randDir = rand(0,360)/180*Math.PI
+                randStrength = 1/20
+                dx = Math.cos(this.dir)*this.speed+Math.cos(dir)*pull+Math.cos(randDir)*randStrength
+                dy = Math.sin(this.dir)*this.speed+Math.sin(dir)*pull+Math.sin(randDir)*randStrength
+                this.dir = Math.atan2(dy, dx)
+                this.speed = Math.sqrt(dy**2+dx**2)
+                if this.speed > 1/5
+                    this.speed *= 0.8
 
-            this.x += Math.cos(this.dir)*event.delta*this.speed
-            this.y += Math.sin(this.dir)*event.delta*this.speed
-
-            #if (dark.alpha < 1)
-            #    dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
-            #    this.dx += (lamp.x-this.x)/1000
-            #    this.dy += (lamp.y-this.y)/1000
-            #dist = Math.sqrt(this.dx**2 + this.dy**2)
-            #speed = 1/10
-            #this.dx *= speed/dist
-            #this.dy *= speed/dist
-            #this.x += this.dx*event.delta
-            #this.y += this.dy*event.delta
-
+                this.x += Math.cos(this.dir)*event.delta*this.speed
+                this.y += Math.sin(this.dir)*event.delta*this.speed
         )
+
+    mouse.on("tick", (event) ->
+        toDelete = []
+        nearestDeadFly = null
+        minDist = 999999
+        for fly in flies when fly.floor
+            dist = Math.sqrt((this.x-fly.x)**2 + (this.y-fly.y)**2)
+            if dist < 20
+                toDelete.push(fly)
+            else if dist < minDist
+                minDist = dist
+                nearestDeadFly = fly
+
+        for fly in toDelete
+            stage.removeChild(fly)
+            index = flies.indexOf(fly)
+            flies.splice(index, 1)
+
+        if nearestDeadFly != null
+            dir = Math.atan2(nearestDeadFly.y-this.y, nearestDeadFly.x-this.x)
+            this.dir = dir
+            this.speed = 1/10
+        else
+            this.dir = 0
+            this.speed = 0
+
+        this.x += Math.cos(this.dir)*event.delta*this.speed
+        this.y += Math.sin(this.dir)*event.delta*this.speed
+    )
 
     #s = new createjs.Shape()
     #s.graphics.s("yellow").f("red").dc(0,0,30).f("blue").dc(30,0,30)
@@ -184,10 +217,49 @@ init = ->
 tick = (event) ->
     stage.update(event)
 
+    if rand(1,1000/event.delta) == 1
+        fly = new createjs.Bitmap(queue.getResult("fly"))
+        stage.addChild(fly)
+        fly.regX = fly.getBounds().width/2
+        fly.regY = fly.getBounds().height/2
+        fly.x = win.x
+        fly.y = win.y
+        fly.dir = rand(0,360)/180*Math.PI
+        fly.speed = 1/5
+        flies.push(fly)
+        fly.on("tick", (event) ->
+            dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
+
+            if this.dead
+                # nop
+            else if dist < 50
+                this.dead = true
+                createjs.Tween.get(this).to({y:stage.canvas.height-rand(0,100), rotation:rand(170,190)}, 1000, createjs.Ease.quadIn).set({floor:true})
+            else
+                this.rotation = rand(-10,10)
+                pull = if dark.alpha < 1
+                    Math.sqrt(dist)/1000
+                else
+                    0
+                dir = Math.atan2(lamp.y-this.y, lamp.x-this.x)
+                randDir = rand(0,360)/180*Math.PI
+                randStrength = 1/20
+                dx = Math.cos(this.dir)*this.speed+Math.cos(dir)*pull+Math.cos(randDir)*randStrength
+                dy = Math.sin(this.dir)*this.speed+Math.sin(dir)*pull+Math.sin(randDir)*randStrength
+                this.dir = Math.atan2(dy, dx)
+                this.speed = Math.sqrt(dy**2+dx**2)
+                if this.speed > 1/5
+                    this.speed *= 0.8
+
+                this.x += Math.cos(this.dir)*event.delta*this.speed
+                this.y += Math.sin(this.dir)*event.delta*this.speed
+        )
+
+
 keydown = (event) ->
     keys[event.keyCode] = true
 
-    objects = [lamp].concat(flies)
+    objects = [lamp, mouse]#.concat(flies)
 
     if event.keyCode == 32
         createjs.Sound.play("click")
