@@ -10,49 +10,45 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="210mm"
-   height="297mm"
-   viewBox="0 0 744.09448819 1052.3622047"
-   id="svg4169"
+   width="84.666664mm"
+   height="84.666664mm"
+   viewBox="0 0 299.99999 299.99999"
+   id="svg6729"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="light.svg"
-   inkscape:export-filename="/home/seb/work/lamp/light.png"
-   inkscape:export-xdpi="108.56207"
-   inkscape:export-ydpi="108.56207">
+   sodipodi:docname="flylight.svg"
+   inkscape:export-filename="/home/seb/work/lamp/flylight.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
-     id="defs4171">
-    <inkscape:path-effect
-       effect="spiro"
-       id="path-effect6695"
-       is_visible="true" />
+     id="defs6731">
     <linearGradient
        inkscape:collect="always"
-       id="linearGradient4742">
+       id="linearGradient7281">
       <stop
-         style="stop-color:#000000;stop-opacity:0"
+         style="stop-color:#ffffff;stop-opacity:1;"
          offset="0"
-         id="stop4744" />
+         id="stop7283" />
       <stop
-         id="stop4750"
-         offset="0.89228004"
-         style="stop-color:#000000;stop-opacity:0.79607843;" />
+         id="stop7289"
+         offset="0.85332483"
+         style="stop-color:#ffffff;stop-opacity:0.33333333;" />
       <stop
-         style="stop-color:#000000;stop-opacity:1"
+         style="stop-color:#ffffff;stop-opacity:0;"
          offset="1"
-         id="stop4746" />
+         id="stop7285" />
     </linearGradient>
     <radialGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient4742"
-       id="radialGradient4748"
-       cx="444.28574"
-       cy="676.64793"
-       fx="444.28574"
-       fy="676.64793"
-       r="795.71429"
+       xlink:href="#linearGradient7281"
+       id="radialGradient7287"
+       cx="391.42856"
+       cy="495.21936"
+       fx="391.42856"
+       fy="495.21936"
+       r="148.57143"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-85.714282,-105.71429)" />
+       gradientTransform="matrix(1.0096154,0,0,1.0096154,84.538051,-71.850165)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -61,19 +57,23 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.175"
-     inkscape:cx="283.09034"
-     inkscape:cy="851.88489"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="-96.895195"
+     inkscape:cy="82.943395"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
      inkscape:window-width="1438"
      inkscape:window-height="849"
      inkscape:window-x="0"
      inkscape:window-y="24"
      inkscape:window-maximized="0" />
   <metadata
-     id="metadata4174">
+     id="metadata6734">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -87,15 +87,13 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
-    <rect
-       style="opacity:1;fill:url(#radialGradient4748);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:4, 4;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect4738"
-       width="3049.0183"
-       height="3049.0183"
-       x="-1157.8566"
-       y="-945.49438"
-       inkscape:export-xdpi="108.56207"
-       inkscape:export-ydpi="108.56207" />
+     id="layer1"
+     transform="translate(-329.73022,-278.13086)">
+    <circle
+       style="opacity:1;fill:url(#radialGradient7287);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path7277"
+       cx="479.73022"
+       cy="428.13086"
+       r="150" />
   </g>
 </svg>
