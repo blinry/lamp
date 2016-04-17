@@ -323,7 +323,7 @@
     title.x = 400;
     title.y = 40;
     title.alpha = 0;
-    line("You've always dreamed of becoming a superhero! (Press Enter to advance text)", function() {
+    line("You've always dreamed of becoming a superhero! (Click/Enter to advance text)", function() {
       return line("Then, last month, a fairy gave you the ability to shapeshift!", function() {
         return line("But she forgot to tell you one important thing.", function() {
           return line("That you would transform into the nearest object to you.", function() {
@@ -644,6 +644,11 @@
   };
 
   window.onload = preload;
+
+  window.addEventListener("mousedown", function(e) {
+    window.focus();
+    return nextFunc();
+  });
 
   window.addEventListener("keydown", function(e) {
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {

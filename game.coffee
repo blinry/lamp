@@ -245,7 +245,7 @@ initIntro = ->
     title.y = 40
     title.alpha = 0
 
-    line("You've always dreamed of becoming a superhero! (Press Enter to advance text)", ->
+    line("You've always dreamed of becoming a superhero! (Click/Enter to advance text)", ->
         line("Then, last month, a fairy gave you the ability to shapeshift!", ->
             line("But she forgot to tell you one important thing.", ->
                 line("That you would transform into the nearest object to you.", ->
@@ -476,6 +476,11 @@ line = (t, f) ->
     nextFunc = f
 
 window.onload = preload
+
+window.addEventListener("mousedown", (e) ->
+    window.focus()
+    nextFunc()
+)
 
 window.addEventListener("keydown", (e) ->
     if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1)
