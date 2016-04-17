@@ -16,9 +16,16 @@
    id="svg4169"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="light.svg">
+   sodipodi:docname="light.svg"
+   inkscape:export-filename="/home/seb/work/lamp/light.png"
+   inkscape:export-xdpi="108.56207"
+   inkscape:export-ydpi="108.56207">
   <defs
      id="defs4171">
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect6695"
+       is_visible="true" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient4742">
@@ -45,7 +52,20 @@
        fy="676.64793"
        r="795.71429"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-85.714284,-105.71429)" />
+       gradientTransform="translate(-85.714282,-105.71429)" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter6725"
+       x="-0.21749835"
+       width="1.4349967"
+       y="-0.23432856"
+       height="1.4686571">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="46.865716"
+         id="feGaussianBlur6727" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -54,9 +74,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.0875"
-     inkscape:cx="1715.2825"
-     inkscape:cy="-142.67202"
+     inkscape:zoom="0.35"
+     inkscape:cx="514.88355"
+     inkscape:cy="437.7363"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -84,11 +104,19 @@
     <rect
        style="opacity:1;fill:url(#radialGradient4748);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:4, 4;stroke-dashoffset:0;stroke-opacity:1"
        id="rect4738"
-       width="4145.0942"
-       height="4145.0942"
-       x="-1705.8945"
-       y="-1493.5323"
+       width="2431.8755"
+       height="2431.8755"
+       x="-849.28516"
+       y="-636.92297"
        inkscape:export-xdpi="108.56207"
        inkscape:export-ydpi="108.56207" />
+    <path
+       style="opacity:0.278;fill:#ffffff;fill-opacity:0.98823529;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter6725)"
+       d="M 302.85714,532.3622 77.142857,983.79078 c 83.587233,58.65132 186.520113,89.22542 288.571423,85.71432 92.83436,-3.194 184.52199,-34.4282 260.00001,-88.57146 l -220,-451.42858 c -30.44191,1.79848 -60.93377,2.75135 -91.42858,2.85714 -3.80951,0.0132 -7.61906,0.0132 -11.42857,0 z"
+       id="path6693"
+       inkscape:path-effect="#path-effect6695"
+       inkscape:original-d="M 302.85714,532.3622 77.142857,983.79078 c 0,0 189.492553,87.11872 288.571423,85.71432 93.97277,-1.332 260.00001,-88.57146 260.00001,-88.57146 l -220,-451.42858 -91.42858,2.85714 z"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccscccc" />
   </g>
 </svg>
