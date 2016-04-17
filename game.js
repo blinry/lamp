@@ -133,7 +133,7 @@
     stage.addChild(pendulum);
     pendulum.visible = false;
     pendulum.x = 588;
-    pendulum.y = 600 - 447;
+    pendulum.y = 600 - 467;
     pendulum.regX = pendulum.getBounds().width / 2;
     pendulum.regY = 4;
     pendulum.time = 0;
@@ -146,8 +146,8 @@
       return pendulum.regX = pendulum.getBounds().width / 2;
     });
     hole = {
-      x: 700,
-      y: 400
+      x: 720,
+      y: 380
     };
     mouse = new createjs.Bitmap(queue.getResult("mouse"));
     stage.addChild(mouse);
@@ -160,13 +160,13 @@
     win = new createjs.Bitmap(queue.getResult("window"));
     stage.addChild(win);
     win.x = 250;
-    win.y = 150;
+    win.y = 140;
     win.regX = win.getBounds().width / 2;
     win.regY = win.getBounds().height / 2;
     socket = new createjs.Bitmap(queue.getResult("socket"));
     stage.addChild(socket);
     socket.x = stage.canvas.width / 2;
-    socket.y = 280;
+    socket.y = 250;
     socket.regX = socket.getBounds().width / 2;
     socket.regY = socket.getBounds().height / 2;
     socket.scaleX = 0.5;
@@ -188,7 +188,7 @@
     lamp.strength = 1;
     lampHeight = 240;
     lamp.on("tick", function(event) {
-      var maxY, speed;
+      var speed;
       speed = 1 / 2;
       if (phase !== "intro") {
         if (isDown(37)) {
@@ -208,12 +208,11 @@
       this.dy *= 0.5;
       this.x += this.dx;
       this.y += this.dy;
-      maxY = 300;
-      if (this.y + lampHeight < 300 + vBorder) {
-        this.y = 300 + vBorder - lampHeight;
+      if (this.y + lampHeight < 280 + vBorder) {
+        this.y = 280 + vBorder - lampHeight;
       }
-      if (this.y + lampHeight > 600 - vBorder) {
-        this.y = 600 - lampHeight - vBorder;
+      if (this.y + lampHeight > 570 - vBorder) {
+        this.y = 570 - lampHeight - vBorder;
       }
       if (this.x < hBorder) {
         this.x = hBorder;
@@ -317,17 +316,17 @@
     switchLight(true);
     text = new createjs.Text("(null)", "20px Helvetica", "white");
     text.x = 10;
-    text.y = 610;
+    text.y = 570;
     stage.addChild(text);
     title = new createjs.Bitmap(queue.getResult("title"));
     stage.addChild(title);
     title.x = 400;
-    title.y = 50;
+    title.y = 40;
     title.alpha = 0;
-    line("You've always dreamed of being a superhero! (Press Enter)", function() {
+    line("You've always dreamed of becoming a superhero! (Press Enter to advance text)", function() {
       return line("Then, last month, a fairy gave you the ability to shapeshift!", function() {
         return line("But she forgot to tell you one important thing.", function() {
-          return line("You would transform into the nearest object to you.", function() {
+          return line("That you would transform into the nearest object to you.", function() {
             createjs.Tween.get(title).to({
               alpha: 1
             }, 1000);
@@ -347,29 +346,31 @@
               }, 1000);
               return line("Press Space to switch yourself on and off.", function() {
                 stage.removeChild(title);
-                return line("You can move around using the arrow keys.", function() {
-                  return line("Besides that, there's not much to do.", function() {
-                    var i, n;
-                    for (n = i = 1; i <= 2; n = ++i) {
-                      flies.push(newFly());
-                    }
-                    return line("See those fireflies? They seem to be... attracted to you.", function() {
-                      return line("But also, they die when they touch you. Oh well.", function() {
-                        return line("To be honest, being a floor lamp isn't terribly exciting.", function() {
-                          return line("It's not like you envisioned your life as a superhero.", function() {
-                            return line("But today, I've got a job for you:", function() {
-                              return line("See that mousehole on the right?", function() {
-                                initGame();
-                                return line("And see that cheese lying around?", function() {
-                                  return line("Make sure that Mr Mouse doesn't starve. Good luck!", function() {
-                                    return line("", function() {
-                                      return line("I'm sure you can figure out the rules by yourself!", function() {
-                                        return line("But if you're stuck, here are some pointers:", function() {
-                                          return line("Mr Mouse is a bit shy, and is scared of your light.", function() {
-                                            return line("But Mr Mouse is attracted by dead fireflies.", function() {
-                                              return line("Help him to eat all the cheese to win!", function() {
-                                                return line("", function() {
-                                                  return 1;
+                return line("Also, you can move around using the arrow keys.", function() {
+                  return line("Awesome superpower, right? Moving! Through space! Wow!", function() {
+                    return line("Let's see... What else is there?", function() {
+                      var i, n;
+                      for (n = i = 1; i <= 2; n = ++i) {
+                        flies.push(newFly());
+                      }
+                      return line("Oh, see those fireflies? They seem to be... attracted to you.", function() {
+                        return line("But also, they die when they touch you. Oh well.", function() {
+                          return line("To be honest, being a floor lamp isn't terribly exciting.", function() {
+                            return line("It's not like you envisioned your life as a superhero.", function() {
+                              return line("But today, I've got a job for you:", function() {
+                                return line("See that mousehole on the right?", function() {
+                                  initGame();
+                                  return line("And see that cheese lying around?", function() {
+                                    return line("Make sure that Mr Mouse doesn't starve. Good luck!", function() {
+                                      return line("", function() {
+                                        return line("I'm sure you can figure out the rules by yourself!", function() {
+                                          return line("But if you're stuck, here are some pointers:", function() {
+                                            return line("Mr Mouse is a bit shy, and is scared of your light.", function() {
+                                              return line("But Mr Mouse is attracted by nearby dead fireflies.", function() {
+                                                return line("Help him eat all the cheese to win!", function() {
+                                                  return line("", function() {
+                                                    return 1;
+                                                  });
                                                 });
                                               });
                                             });
@@ -416,11 +417,11 @@
       }
       if (cheeses.length === 0) {
         phase = "end";
-        flies.push(newFly(true, true));
         line("Yay, you did it! (Press Enter)", function() {
           return line("You might not be the superhero you dreamed of...", function() {
+            flies.push(newFly(true, true));
             return line("But... you're definitely... MY hero today! <3 *squeak*", function() {
-              return line("Thanks for playing!", function() {
+              return line("Thanks for playing! :)", function() {
                 return 1;
               });
             });
@@ -460,9 +461,9 @@
         glowy = glow[k];
         l.addChild(glowy.clone());
       }
-      l.cache(0, 0, 800, 650);
+      l.cache(0, 0, 800, 600);
       stage.filters = [new createjs.AlphaMaskFilter(l.cacheCanvas)];
-      return stage.cache(0, 0, 800, 650);
+      return stage.cache(0, 0, 800, 600);
     }
   };
 
@@ -610,7 +611,7 @@
     cheese.regY = cheese.getBounds().height / 2;
     stage.addChildAt(cheese, stage.getChildIndex(socket));
     cheese.x = x;
-    cheese.y = rand(300 + vBorder, 600 - vBorder);
+    cheese.y = rand(260 + vBorder, 560 - vBorder);
     cheese.alpha = 0;
     createjs.Tween.get(cheese).to({
       alpha: 1
@@ -627,14 +628,18 @@
       ll.x = fly.x;
       ll.y = fly.y;
       l.addChild(ll);
-      l.cache(0, 0, 800, 650);
+      l.cache(0, 0, 800, 600);
     }
     stage.filters = [new createjs.AlphaMaskFilter(l.cacheCanvas)];
-    return stage.cache(0, 0, 800, 650);
+    return stage.cache(0, 0, 800, 600);
   };
 
   line = function(t, f) {
+    text.alpha = 0;
     text.text = t;
+    createjs.Tween.get(text).to({
+      alpha: 1
+    }, 400);
     return nextFunc = f;
   };
 

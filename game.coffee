@@ -72,7 +72,7 @@ initIntro = ->
     stage.addChild(pendulum)
     pendulum.visible = false
     pendulum.x = 588
-    pendulum.y = 600-447
+    pendulum.y = 600-467
     pendulum.regX = pendulum.getBounds().width/2
     pendulum.regY = 4
     pendulum.time = 0
@@ -85,7 +85,7 @@ initIntro = ->
         pendulum.regX = pendulum.getBounds().width/2
     )
 
-    hole = {x:700, y:400}
+    hole = {x:720, y:380}
 
     mouse = new createjs.Bitmap(queue.getResult("mouse"))
     stage.addChild(mouse)
@@ -99,14 +99,14 @@ initIntro = ->
     win = new createjs.Bitmap(queue.getResult("window"))
     stage.addChild(win)
     win.x = 250
-    win.y = 150
+    win.y = 140
     win.regX = win.getBounds().width/2
     win.regY = win.getBounds().height/2
 
     socket = new createjs.Bitmap(queue.getResult("socket"))
     stage.addChild(socket)
     socket.x = stage.canvas.width/2
-    socket.y = 280
+    socket.y = 250
     socket.regX = socket.getBounds().width/2
     socket.regY = socket.getBounds().height/2
     socket.scaleX = 0.5
@@ -147,11 +147,10 @@ initIntro = ->
         this.x += this.dx
         this.y += this.dy
 
-        maxY = 300
-        if this.y+lampHeight < 300+vBorder
-            this.y = 300+vBorder-lampHeight
-        if this.y+lampHeight > 600-vBorder
-            this.y = 600-lampHeight-vBorder
+        if this.y+lampHeight < 280+vBorder
+            this.y = 280+vBorder-lampHeight
+        if this.y+lampHeight > 570-vBorder
+            this.y = 570-lampHeight-vBorder
         if this.x < hBorder
             this.x = hBorder
         if this.x > stage.canvas.width-hBorder
@@ -237,19 +236,19 @@ initIntro = ->
 
     text = new createjs.Text("(null)", "20px Helvetica", "white")
     text.x = 10
-    text.y = 610
+    text.y = 570
     stage.addChild(text)
 
     title = new createjs.Bitmap(queue.getResult("title"))
     stage.addChild(title)
     title.x = 400
-    title.y = 50
+    title.y = 40
     title.alpha = 0
 
-    line("You've always dreamed of being a superhero! (Press Enter)", ->
+    line("You've always dreamed of becoming a superhero! (Press Enter to advance text)", ->
         line("Then, last month, a fairy gave you the ability to shapeshift!", ->
             line("But she forgot to tell you one important thing.", ->
-                line("You would transform into the nearest object to you.", ->
+                line("That you would transform into the nearest object to you.", ->
                     createjs.Tween.get(title).to({alpha: 1}, 1000)
                     line("So, yeah. You're a floor lamp now. Congrats.", ->
                         createjs.Tween.get(title).to({alpha: 0}, 1000)
@@ -259,28 +258,29 @@ initIntro = ->
                         createjs.Tween.get(pendulum).to({visible:true}, 1000)
                         line("Press Space to switch yourself on and off.", ->
                             stage.removeChild(title)
-                            line("You can move around using the arrow keys.", ->
-                                line("Besides that, there's not much to do.", ->
-                                    for n in [1..2]
-                                        flies.push(newFly())
-                                    line("See those fireflies? They seem to be... attracted to you.", ->
-                                        line("But also, they die when they touch you. Oh well.", ->
-                                           line("To be honest, being a floor lamp isn't terribly exciting.", ->
-                                                line("It's not like you envisioned your life as a superhero.", ->
-                                                    line("But today, I've got a job for you:", ->
-                                                        line("See that mousehole on the right?", ->
-                                                            initGame()
-                                                            line("And see that cheese lying around?", ->
-                                                                line("Make sure that Mr Mouse doesn't starve. Good luck!", ->
-                                                                    line("", ->
-                                                                        line("I'm sure you can figure out the rules by yourself!", ->
-                                                                            line("But if you're stuck, here are some pointers:", ->
-                                                                                line("Mr Mouse is a bit shy, and is scared of your light.", ->
-                                                                                    line("But Mr Mouse is attracted by dead fireflies.", ->
-                                                                                        line("Help him to eat all the cheese to win!", ->
-                                                                                            line("", ->
-                                                                                                1 # nop
-    )))))))))))))))))))))))
+                            line("Also, you can move around using the arrow keys.", ->
+                                line("Awesome superpower, right? Moving! Through space! Wow!", ->
+                                    line("Let's see... What else is there?", ->
+                                        for n in [1..2]
+                                            flies.push(newFly())
+                                        line("Oh, see those fireflies? They seem to be... attracted to you.", ->
+                                            line("But also, they die when they touch you. Oh well.", ->
+                                               line("To be honest, being a floor lamp isn't terribly exciting.", ->
+                                                    line("It's not like you envisioned your life as a superhero.", ->
+                                                        line("But today, I've got a job for you:", ->
+                                                            line("See that mousehole on the right?", ->
+                                                                initGame()
+                                                                line("And see that cheese lying around?", ->
+                                                                    line("Make sure that Mr Mouse doesn't starve. Good luck!", ->
+                                                                        line("", ->
+                                                                            line("I'm sure you can figure out the rules by yourself!", ->
+                                                                                line("But if you're stuck, here are some pointers:", ->
+                                                                                    line("Mr Mouse is a bit shy, and is scared of your light.", ->
+                                                                                        line("But Mr Mouse is attracted by nearby dead fireflies.", ->
+                                                                                            line("Help him eat all the cheese to win!", ->
+                                                                                                line("", ->
+                                                                                                    1 # nop
+    ))))))))))))))))))))))))
 
     createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED
     createjs.Ticker.on("tick", tick)
@@ -303,11 +303,11 @@ tick = (event) ->
             flies.push(newFly())
         if cheeses.length == 0
             phase = "end"
-            flies.push(newFly(true, true))
             line("Yay, you did it! (Press Enter)", ->
                 line("You might not be the superhero you dreamed of...", ->
+                    flies.push(newFly(true, true))
                     line("But... you're definitely... MY hero today! <3 *squeak*", ->
-                        line("Thanks for playing!", ->
+                        line("Thanks for playing! :)", ->
                             1 # nop
             ))))
 
@@ -339,11 +339,11 @@ tick = (event) ->
         for glowy in glow
             l.addChild(glowy.clone())
 
-        l.cache(0,0,800,650)
+        l.cache(0,0,800,600)
         stage.filters = [
             new createjs.AlphaMaskFilter(l.cacheCanvas)
         ]
-        stage.cache(0,0,800,650)
+        stage.cache(0,0,800,600)
 
 keydown = (event) ->
     keys[event.keyCode] = true
@@ -451,7 +451,7 @@ newCheese = (x) ->
     cheese.regY = cheese.getBounds().height/2
     stage.addChildAt(cheese, stage.getChildIndex(socket))
     cheese.x = x
-    cheese.y = rand(300+vBorder,600-vBorder)
+    cheese.y = rand(260+vBorder,560-vBorder)
     cheese.alpha = 0
     createjs.Tween.get(cheese).to({alpha:1}, 2000)
     cheese
@@ -463,14 +463,16 @@ lightOff = ->
         ll.x = fly.x
         ll.y = fly.y
         l.addChild(ll)
-        l.cache(0,0,800,650)
+        l.cache(0,0,800,600)
     stage.filters = [
         new createjs.AlphaMaskFilter(l.cacheCanvas)
     ]
-    stage.cache(0,0,800,650)
+    stage.cache(0,0,800,600)
 
 line = (t, f) ->
+    text.alpha = 0
     text.text = t
+    createjs.Tween.get(text).to({alpha: 1}, 400)
     nextFunc = f
 
 window.onload = preload
