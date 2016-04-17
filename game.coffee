@@ -1,3 +1,5 @@
+# No, don't look at me, I'm hideous!
+
 rand = (min, max) -> Math.floor Math.random()*(max - min + 1) + min
 
 stage = null
@@ -15,7 +17,10 @@ keys = {}
 lampHeight = null
 lightOn = true
 text = null
+title = null
 nextFunc = null
+spaceReady = true
+enterReady = true
 
 hBorder = 150
 vBorder = 50
@@ -24,6 +29,11 @@ phase = "intro"
 
 preload = ->
     stage = new createjs.Stage("canvas")
+    loading = new createjs.Text("Loading...", "30px Helvetica", "white")
+    loading.x = 300
+    loading.y = 300
+    stage.addChild(loading)
+    stage.update()
 
     queue = new createjs.LoadQueue(false)
     queue.installPlugin(createjs.Sound)
@@ -35,22 +45,45 @@ preload = ->
         {src: "omnomnom.wav", id: "omnomnom"}
         {src: "zap.wav", id: "zap"}
         {src: "room.png", id: "room"}
+        {src: "pendulum.png", id: "pendulum"}
+        {src: "pendulum2.png", id: "pendulum2"}
         {src: "lamp.png", id: "lamp"}
         {src: "flylight.png", id: "flylight"}
         {src: "fly.png", id: "fly"}
+        {src: "lovefly.png", id: "lovefly"}
         {src: "window.png", id: "window"}
         {src: "mouse.png", id: "mouse"}
         {src: "socket.png", id: "socket"}
         {src: "cheese.png", id: "cheese"}
+        {src: "title.png", id: "title"}
     ]
     queue.loadManifest(manifest)
     queue.on("complete", (event) ->
+        stage.removeChild(loading)
         initIntro()
     )
 
 initIntro = ->
     room = new createjs.Bitmap(queue.getResult("room"))
     stage.addChild(room)
+    room.visible = false
+
+    pendulum = new createjs.Bitmap(queue.getResult("pendulum"))
+    stage.addChild(pendulum)
+    pendulum.visible = false
+    pendulum.x = 588
+    pendulum.y = 600-447
+    pendulum.regX = pendulum.getBounds().width/2
+    pendulum.regY = 4
+    pendulum.time = 0
+    pendulum.on("tick", (event) ->
+        pendulum.time += event.delta
+        pendulum.rotation = Math.PI/2+Math.sin(pendulum.time/1000*Math.PI)*10
+    )
+    pendulum.on("click", (event) ->
+        this.image = queue.getResult("pendulum2")
+        pendulum.regX = pendulum.getBounds().width/2
+    )
 
     hole = {x:700, y:400}
 
@@ -60,6 +93,8 @@ initIntro = ->
     mouse.y = hole.y
     mouse.regY = mouse.getBounds().height/2
     mouse.regX = mouse.getBounds().width/8
+    mouse.dir = 0
+    mouse.speed = 0
 
     win = new createjs.Bitmap(queue.getResult("window"))
     stage.addChild(win)
@@ -76,6 +111,7 @@ initIntro = ->
     socket.regY = socket.getBounds().height/2
     socket.scaleX = 0.5
     socket.scaleY = 0.5
+    socket.visible = false
 
     cable = new createjs.Shape()
     stage.addChild(cable)
@@ -133,7 +169,15 @@ initIntro = ->
 
         this.rotation = rand(-1,1)
         lampDist = Math.sqrt((this.x-lamp.x)**2 + (this.y-lamp.y)**2)
-        if lightOn and lampDist < lamp.range
+        if phase == "end"
+            lampDist = Math.sqrt((this.x-lamp.x)**2 + (this.y-(lamp.y+lampHeight))**2)
+            if lampDist > 60
+                this.dir = Math.atan2(lamp.y+lampHeight-this.y, lamp.x-this.x)
+                this.speed = 1/5
+            else
+                this.rotation = 0
+                this.speed = 0
+        else if lightOn and lampDist < lamp.range
             this.dir = Math.atan2(hole.y-this.y, hole.x-this.x)
             this.speed = 1/10
         else
@@ -177,8 +221,8 @@ initIntro = ->
                 this.dir = dir
                 this.speed = 1/20
             else
-                this.dir = 0
                 this.speed = 0
+                this.rotation = 0
 
         if this.dir > -Math.PI/2 and this.dir < Math.PI/2
             this.scaleX = -1
@@ -196,30 +240,49 @@ initIntro = ->
     text.y = 610
     stage.addChild(text)
 
+    title = new createjs.Bitmap(queue.getResult("title"))
+    stage.addChild(title)
+    title.x = 400
+    title.y = 50
+    title.alpha = 0
+
     line("You've always dreamed of being a superhero! (Press Enter)", ->
         line("Then, last month, a fairy gave you the ability to shapeshift!", ->
             line("But she forgot to tell you one important thing.", ->
                 line("You would transform into the nearest object to you.", ->
+                    createjs.Tween.get(title).to({alpha: 1}, 1000)
                     line("So, yeah. You're a floor lamp now. Congrats.", ->
+                        createjs.Tween.get(title).to({alpha: 0}, 1000)
                         phase = "tutorial"
+                        createjs.Tween.get(room).to({visible:true}, 1000)
+                        createjs.Tween.get(socket).to({visible:true}, 1000)
+                        createjs.Tween.get(pendulum).to({visible:true}, 1000)
                         line("Press Space to switch yourself on and off.", ->
+                            stage.removeChild(title)
                             line("You can move around using the arrow keys.", ->
                                 line("Besides that, there's not much to do.", ->
-                                    for n in [1..3]
-                                        flies.push(newFly(false))
+                                    for n in [1..2]
+                                        flies.push(newFly())
                                     line("See those fireflies? They seem to be... attracted to you.", ->
                                         line("But also, they die when they touch you. Oh well.", ->
                                            line("To be honest, being a floor lamp isn't terribly exciting.", ->
-                                                line("It's not like you envisioned your amazing life as a superhero.", ->
+                                                line("It's not like you envisioned your life as a superhero.", ->
                                                     line("But today, I've got a job for you:", ->
-                                                        initGame()
-                                                        line("Make sure that Mr Mouse doesn't starve. Good Luck!", ->
-                                                            line("--- End of the Intro ---", ->
-                                                                line("", ->
-                                                                    1 # nop
-    ))))))))))))))))
+                                                        line("See that mousehole on the right?", ->
+                                                            initGame()
+                                                            line("And see that cheese lying around?", ->
+                                                                line("Make sure that Mr Mouse doesn't starve. Good luck!", ->
+                                                                    line("", ->
+                                                                        line("I'm sure you can figure out the rules by yourself!", ->
+                                                                            line("But if you're stuck, here are some pointers:", ->
+                                                                                line("Mr Mouse is a bit shy, and is scared of your light.", ->
+                                                                                    line("But Mr Mouse is attracted by dead fireflies.", ->
+                                                                                        line("Help him to eat all the cheese to win!", ->
+                                                                                            line("", ->
+                                                                                                1 # nop
+    )))))))))))))))))))))))
 
-    #createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED
+    createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED
     createjs.Ticker.on("tick", tick)
     createjs.Ticker.setFPS(30)
 
@@ -227,54 +290,70 @@ initIntro = ->
     document.onkeyup = keyup
 
 initGame = ->
+    cheeses.push(newCheese(200))
+    cheeses.push(newCheese(300))
+    cheeses.push(newCheese(400))
     phase = "game"
-    for n in [1..3]
-        cheeses.push(newCheese())
 
 tick = (event) ->
     stage.update(event)
 
-    if phase == "game" and rand(1,2000/event.delta) == 1 and flies.length < 10 and lightOn
-        flies.push(newFly())
+    if phase == "game"
+        if rand(1,2000/event.delta) == 1 and flies.length < 10 and lightOn
+            flies.push(newFly())
+        if cheeses.length == 0
+            phase = "end"
+            flies.push(newFly(true, true))
+            line("Yay, you did it! (Press Enter)", ->
+                line("You might not be the superhero you dreamed of...", ->
+                    line("But... you're definitely... MY hero today! <3 *squeak*", ->
+                        line("Thanks for playing!", ->
+                            1 # nop
+            ))))
 
     # update lightmap
-    lights = []
-    glow = [text]
-    if lightOn
-        lights.push(lamp)
-    else
-        for fly in flies
-            lights.push(fly)
-        glow.push(win)
+    if phase != "intro"
+        lights = []
+        glow = [text]
+        if stage.getChildIndex(title) != -1
+            glow.push(title)
+        if lightOn
+            lights.push(lamp)
+        else
+            for fly in flies
+                lights.push(fly)
+            glow.push(win)
 
-    l = new createjs.Container()
-    for light in lights
-        ll = new createjs.Bitmap(queue.getResult("flylight"))
-        ll.x = light.x
-        ll.y = light.y
-        ll.regX = ll.getBounds().width/2
-        ll.regY = ll.getBounds().height/2
-        ll.scaleX = light.range/150
-        ll.scaleY = light.range/150
-        ll.alpha = light.strength
-        l.addChild(ll)
+        l = new createjs.Container()
+        for light in lights
+            ll = new createjs.Bitmap(queue.getResult("flylight"))
+            ll.x = light.x
+            ll.y = light.y
+            ll.regX = ll.getBounds().width/2
+            ll.regY = ll.getBounds().height/2
+            ll.scaleX = light.range/150
+            ll.scaleY = light.range/150
+            ll.alpha = light.strength
+            l.addChild(ll)
 
-    for glowy in glow
-        l.addChild(glowy.clone())
+        for glowy in glow
+            l.addChild(glowy.clone())
 
-    l.cache(0,0,800,650)
-    stage.filters = [
-        new createjs.AlphaMaskFilter(l.cacheCanvas)
-    ]
-    stage.cache(0,0,800,650)
+        l.cache(0,0,800,650)
+        stage.filters = [
+            new createjs.AlphaMaskFilter(l.cacheCanvas)
+        ]
+        stage.cache(0,0,800,650)
 
 keydown = (event) ->
     keys[event.keyCode] = true
 
     if phase != "intro"
-        if event.keyCode == 32 # space
+        if event.keyCode == 32 and spaceReady # space
+            spaceReady = false
             switchLight()
-    if event.keyCode == 13 # enter
+    if event.keyCode == 13 and enterReady # enter
+        enterReady = false
         nextFunc()
 
 switchLight = (silent=false) ->
@@ -297,6 +376,10 @@ switchLight = (silent=false) ->
 
 keyup = (event) ->
     keys[event.keyCode] = false
+    if event.keyCode == 32 # space
+        spaceReady = true
+    if event.keyCode == 13 # enter
+        enterReady = true
 
 isDown = (keyCode) ->
     if keys[keyCode]
@@ -304,8 +387,10 @@ isDown = (keyCode) ->
     else
         false
 
-newFly = (window=true) ->
+newFly = (window=true, love=false) ->
     fly = new createjs.Bitmap(queue.getResult("fly"))
+    if love
+        fly = new createjs.Bitmap(queue.getResult("lovefly"))
     fly.regX = fly.getBounds().width/2
     fly.regY = fly.getBounds().height/2
     border = 100
@@ -318,7 +403,10 @@ newFly = (window=true) ->
     fly.speed = 1/5
     fly.range = 200
     fly.strength = 0.5
-    stage.addChildAt(fly, stage.getChildIndex(socket))
+    if love
+        stage.addChild(fly)
+    else
+        stage.addChildAt(fly, stage.getChildIndex(socket))
     createjs.Sound.play("bsss")
     fly.on("tick", (event) ->
         dist = Math.sqrt((lamp.y-this.y)**2 + (lamp.x-this.x)**2)
@@ -332,9 +420,9 @@ newFly = (window=true) ->
                 index = flies.indexOf(fly)
                 flies.splice(index, 1)
         else
-            if dist < 50 and lightOn
+            if dist < 50 and lightOn and not love
                 this.dead = true
-                createjs.Sound.play("zap")
+                createjs.Sound.play("zap", "any")
                 createjs.Tween.get(this).to({y:this.y+lampHeight, rotation:rand(150,210)}, 500, createjs.Ease.quadIn).set({floor:true})
             else
                 this.rotation = rand(-10,10)
@@ -357,13 +445,15 @@ newFly = (window=true) ->
     )
     fly
 
-newCheese = ->
+newCheese = (x) ->
     cheese = new createjs.Bitmap(queue.getResult("cheese"))
     cheese.regX = cheese.getBounds().width/2
     cheese.regY = cheese.getBounds().height/2
     stage.addChildAt(cheese, stage.getChildIndex(socket))
-    cheese.x = rand(hBorder,(stage.canvas.width/2))
+    cheese.x = x
     cheese.y = rand(300+vBorder,600-vBorder)
+    cheese.alpha = 0
+    createjs.Tween.get(cheese).to({alpha:1}, 2000)
     cheese
 
 lightOff = ->
